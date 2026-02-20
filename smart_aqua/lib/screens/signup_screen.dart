@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/validators.dart';
+import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -154,10 +155,30 @@ class _SignupScreenState extends State<SignupScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  isPasswordVisible = !isPasswordVisible;
-                                });
-                              },
+                                if (_formKey.currentState!.validate()) {
+                                  if (!acceptTerms) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Accept Terms & Conditions")),
+                                    );
+                                    return;
+                                  }
+                                  bool success = AuthService.register(
+                                    nameController.text,
+                                    phoneController.text,
+                                    passwordController.text,
+                                  );
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Registration Successful")),
+                                    );
+                                    Navigator.pop(context);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("User already exists")),
+                                    );
+                                  }
+                                }
+                              }
                             ),
                           ),
                           validator: Validators.validatePassword,

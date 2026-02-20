@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../screens/water_quality_screen.dart';
+import 'patient_details_screen.dart';
 import '../widgets/ui_components.dart';
 
 

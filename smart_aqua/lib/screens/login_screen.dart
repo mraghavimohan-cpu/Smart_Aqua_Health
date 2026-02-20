@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/validators.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -93,9 +94,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() {
-                                  isPasswordVisible = !isPasswordVisible;
-                                });
+                                if (_formKey.currentState!.validate()) {
+                                  bool success = AuthService.login(
+                                    phoneController.text,
+                                    passwordController.text,
+                                  );
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Login Successful")),
+                                    );
+                                    Navigator.pushReplacementNamed(context, '/patient');
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Invalid phone or password")),
+                                    );
+                                  }
+                                }
                               },
                             ),
                           ),

@@ -61,11 +61,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
               SizedBox(height: 20),
 
               buildButton("Next", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => WaterQualityScreen()),
-                );
+                Navigator.pushNamed(context, '../screens/water_quality_screen.dart');
               }),
             ],
           ),

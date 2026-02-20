@@ -40,10 +40,7 @@ class _AIPredictionScreenState extends State<AIPredictionScreen> {
               SizedBox(height: 20),
 
               buildButton("Generate Report", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => FinalReportScreen()),
-                );
+                Navigator.pushNamed(context, '../screens/final_report_screen.dart');
               }),
             ],
           ),

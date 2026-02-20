@@ -28,10 +28,7 @@ class WaterQualityScreen extends StatelessWidget {
               SizedBox(height: 20),
 
               buildButton("Predict Disease", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => AIPredictionScreen()),
-                );
+                Navigator.pushNamed(context, '../screens/ai_prediction_screen.dart');
               }),
             ],
           ),
