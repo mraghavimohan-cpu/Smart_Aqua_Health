@@ -16,8 +16,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Water Health Monitor',
-      theme: ThemeData(primarySwatch: Colors.blue),
+
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+      ),
+
       initialRoute: '/',
+
       routes: {
         '/': (context) => LoginScreen(),
         '/signup': (context) => SignupScreen(),

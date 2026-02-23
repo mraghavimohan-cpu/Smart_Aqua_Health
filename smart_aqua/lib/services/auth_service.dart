@@ -1,15 +1,11 @@
 class AuthService {
-  static List<Map<String, String>> users = [];
+  static final List<Map<String, String>> _users = [];
 
   static bool register(String name, String phone, String password) {
-    bool userExists =
-        users.any((user) => user['phone'] == phone);
+    bool exists = _users.any((user) => user['phone'] == phone);
+    if (exists) return false;
 
-    if (userExists) {
-      return false;
-    }
-
-    users.add({
+    _users.add({
       'name': name,
       'phone': phone,
       'password': password,
@@ -18,9 +14,20 @@ class AuthService {
     return true;
   }
 
-  static bool login(String phone, String password) {
-    return users.any((user) =>
-        user['phone'] == phone &&
-        user['password'] == password);
+  static String login(String phone, String password) {
+    final user = _users.firstWhere(
+      (u) => u['phone'] == phone,
+      orElse: () => {},
+    );
+
+    if (user.isEmpty) {
+      return "Phone number not registered";
+    }
+
+    if (user['password'] != password) {
+      return "Incorrect password";
+    }
+
+    return "success";
   }
 }
