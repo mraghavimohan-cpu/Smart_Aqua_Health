@@ -1,164 +1,160 @@
 import 'package:flutter/material.dart';
+import 'ai_prediction_screen.dart';
 
 class WaterQualityScreen extends StatelessWidget {
-  final Map<String, dynamic> waterData = {
-    "pH": {"value": 7.2, "unit": "pH"},
-    "Turbidity": {"value": 4.5, "unit": "NTU"},
-    "Temperature": {"value": 24.1, "unit": "°C"},
-    "Dissolved O₂": {"value": 8.2, "unit": "mg/L"},
+  WaterQualityScreen({Key? key}) : super(key: key);
+
+  final Map<String, double> waterData = {
+    "pH Level": 7.2,
+    "Turbidity": 4.5,
+    "Temperature": 24.1,
+    "Dissolved Oxygen": 8.2,
   };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF2F6F7),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
+      backgroundColor: Colors.grey[100],
+
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Health Assessment",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "2. Water Quality",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.green[100],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "LIVE SYNCED",
+                    style: TextStyle(
+                      color: Colors.green[800],
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 )
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Title
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "2. Water Quality",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        "LIVE SYNCED",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.green,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    )
-                  ],
-                ),
 
-                SizedBox(height: 20),
+            SizedBox(height: 25),
 
-                // Grid Cards
-                GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.4,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: waterData.entries.map((entry) {
-                    return _buildMetricCard(
-                      entry.key,
-                      entry.value["value"],
-                      entry.value["unit"],
-                    );
-                  }).toList(),
-                ),
-
-                SizedBox(height: 20),
-
-                // Info Box
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.teal),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "Sensor data is automatically retrieved from the nearest monitoring station.",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 20),
-
-                // Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, "/ai_prediction");
-                    },
-                    child: Text(
-                      "Validate and Predict",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
+            /// Grid
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
+                childAspectRatio: 1.2,
+                children: waterData.entries.map((entry) {
+                  return buildWaterCard(entry.key, entry.value);
+                }).toList(),
+              ),
             ),
-          ),
+
+            SizedBox(height: 20),
+
+            /// Button
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal[800],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          AiPredictionScreen(waterData: waterData),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Validate and Predict",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildMetricCard(String title, double value, String unit) {
+  Widget buildWaterCard(String title, double value) {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Color(0xFFF7F9FA),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             title.toUpperCase(),
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey,
-              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 8),
+          Spacer(),
           Text(
-            "$value $unit",
+            value.toString(),
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.teal,
+              color: Colors.teal[800],
             ),
+          ),
+          SizedBox(height: 10),
+          LinearProgressIndicator(
+            value: 0.7,
+            backgroundColor: Colors.grey.shade200,
+            color: Colors.teal,
           ),
         ],
       ),
