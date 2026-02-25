@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'final_report_screen.dart';
 
 class AiPredictionScreen extends StatelessWidget {
   final Map<String, double> waterData;
@@ -11,22 +12,16 @@ class AiPredictionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double turbidity = waterData["Turbidity"] ?? 0;
-    final double ph = waterData["pH Level"] ?? 7;
     final double temperature = waterData["Temperature"] ?? 25;
 
-    /// Simple AI Risk Logic
-    bool highRisk = turbidity > 5 || ph > 8.5 || ph < 6.5;
-
-    String riskLabel = highRisk ? "HIGH RISK" : "SAFE";
-    Color riskColor = highRisk ? Colors.red : Colors.green;
-    String disease = highRisk ? "Cholera" : "No Major Threat";
+    bool highRisk = turbidity > 5;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
 
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
+        backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           "AI Prediction & Dashboard",
@@ -40,77 +35,98 @@ class AiPredictionScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// HEADER
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 26,
-                  backgroundColor: Colors.teal[100],
-                  child: Icon(Icons.analytics,
-                      color: Colors.teal[800]),
+            /// HEADER CARD
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.blue.shade100,
+                  width: 2,
                 ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      "HealthMonitor AI",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.teal[100],
+                    child: Icon(Icons.show_chart,
+                        color: Colors.teal[800]),
+                  ),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "HealthMonitor AI",
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight:
+                                FontWeight.bold),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "LIVE MONITORING",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w500,
+                      SizedBox(height: 4),
+                      Text(
+                        "LIVE MONITORING",
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontWeight:
+                                FontWeight.w600),
                       ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                const Icon(Icons.notifications_none),
-              ],
+                    ],
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.notifications_none),
+                ],
+              ),
             ),
 
             const SizedBox(height: 25),
 
-            /// MAIN PREDICTION CARD
+            /// MAIN RESULT CARD
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 8,
-                  )
-                ],
+                borderRadius: BorderRadius.circular(20),
+                border: Border(
+                  left: BorderSide(
+                    color: highRisk
+                        ? Colors.red
+                        : Colors.green,
+                    width: 5,
+                  ),
+                ),
               ),
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
 
-                  /// Risk Badge
+                  /// RISK BADGE
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6),
                     decoration: BoxDecoration(
-                      color: riskColor.withOpacity(0.15),
+                      color: highRisk
+                          ? Colors.red[100]
+                          : Colors.green[100],
                       borderRadius:
                           BorderRadius.circular(20),
                     ),
                     child: Text(
-                      riskLabel,
+                      highRisk
+                          ? "HIGH RISK"
+                          : "SAFE",
                       style: TextStyle(
-                        color: riskColor,
-                        fontWeight: FontWeight.bold,
+                        color: highRisk
+                            ? Colors.red
+                            : Colors.green,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
                   ),
@@ -120,30 +136,31 @@ class AiPredictionScreen extends StatelessWidget {
                   const Text(
                     "AI PREDICTION RESULT",
                     style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
+                        fontSize: 12,
+                        color: Colors.grey),
                   ),
 
                   const SizedBox(height: 10),
 
                   Text(
                     highRisk
-                        ? "Risk Detected: $disease"
+                        ? "Risk Detected: Cholera"
                         : "Water Quality Stable",
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: riskColor,
+                      fontWeight:
+                          FontWeight.bold,
+                      color: highRisk
+                          ? Colors.red
+                          : Colors.green,
                     ),
                   ),
 
                   const SizedBox(height: 10),
 
-                  Text(
-                    highRisk
-                        ? "Model confidence: 92% probability of bacterial contamination."
-                        : "All monitored parameters are within safe thresholds.",
+                  const Text(
+                    "Neural network analysis shows 92% confidence "
+                    "of bacterial contamination in sector A-12.",
                   ),
 
                   const SizedBox(height: 20),
@@ -152,39 +169,31 @@ class AiPredictionScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
+                          style:
+                              ElevatedButton.styleFrom(
                             backgroundColor:
                                 Colors.teal[800],
                             shape:
                                 RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(
-                                      20),
+                                  BorderRadius
+                                      .circular(
+                                          20),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, '/report');
-                          },
-                          child:
-                              const Text("Generate Report"),
+                          onPressed: () {},
+                          child: const Text(
+                              "Verify Details"),
                         ),
                       ),
                       const SizedBox(width: 10),
                       OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                                    20),
-                          ),
-                        ),
                         onPressed: () {},
-                        child: const Text("Share"),
-                      )
+                        child:
+                            const Text("Share"),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -195,27 +204,87 @@ class AiPredictionScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: buildSmallCard(
-                    "Water State",
-                    highRisk
+                  child: buildStatusCard(
+                    icon: Icons.water_drop,
+                    title: "WATER STATE",
+                    value: highRisk
                         ? "Contaminated"
                         : "Safe",
-                    "Turbidity: $turbidity NTU",
-                    highRisk
+                    subtitle:
+                        "Turbidity: $turbidity NTU",
+                    color: highRisk
                         ? Colors.red
                         : Colors.green,
                   ),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
-                  child: buildSmallCard(
-                    "Environment",
-                    "$temperature °C",
-                    "pH Level: $ph",
-                    Colors.teal,
+                  child: buildStatusCard(
+                    icon: Icons.thermostat,
+                    title: "ENVIRONMENT",
+                    value: "$temperature°C",
+                    subtitle: "Humidity: 68%",
+                    color: Colors.teal,
                   ),
                 ),
               ],
+            ),
+
+            const SizedBox(height: 25),
+
+            /// ALERT STATUS
+            const Text(
+              "Automated Alert Status",
+              style:
+                  TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 15),
+
+            buildAlertTile(
+              "SMS Alert Sent",
+              "Broadcasted to 450 residents.",
+              "14:05 PM",
+            ),
+            const SizedBox(height: 10),
+            buildAlertTile(
+              "Voice Call Initiated",
+              "Public Utility Board notified.",
+              "14:06 PM",
+            ),
+
+            const SizedBox(height: 35),
+
+            /// FINAL REPORT BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      const Color(0xFF0D1B2A),
+                  shape:
+                      RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(
+                            20),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/report',
+                    arguments: waterData,
+                  );
+                },
+                child: const Text(
+                  "View Final Report",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -223,11 +292,13 @@ class AiPredictionScreen extends StatelessWidget {
     );
   }
 
-  Widget buildSmallCard(
-      String title,
-      String value,
-      String subtitle,
-      Color color) {
+  Widget buildStatusCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    required String subtitle,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -239,18 +310,56 @@ class AiPredictionScreen extends StatelessWidget {
         crossAxisAlignment:
             CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.grey)),
+          Icon(icon, color: color),
           const SizedBox(height: 8),
+          Text(title,
+              style:
+                  const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 5),
           Text(value,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: color,
-              )),
+                  fontSize: 18,
+                  fontWeight:
+                      FontWeight.bold,
+                  color: color)),
           const SizedBox(height: 4),
           Text(subtitle,
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  Widget buildAlertTile(
+      String title, String subtitle, String time) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius:
+            BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.check_circle,
+              color: Colors.green),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight:
+                            FontWeight.bold)),
+                Text(subtitle),
+              ],
+            ),
+          ),
+          Text(time,
               style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey)),

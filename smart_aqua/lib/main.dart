@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/patient_details_screen.dart';
@@ -18,29 +19,45 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Water Health Monitor',
+
       theme: ThemeData(
         primarySwatch: Colors.teal,
+        scaffoldBackgroundColor: const Color(0xFFF3F5F7),
       ),
+
       initialRoute: '/',
 
+      /// STATIC ROUTES (No required parameters)
       routes: {
         '/': (context) => LoginScreen(),
         '/signup': (context) => SignupScreen(),
         '/patient': (context) => PatientDetailsScreen(),
         '/water': (context) => WaterQualityScreen(),
-        '/report': (context) => FinalReportScreen(),
       },
 
+      /// DYNAMIC ROUTES (Require arguments)
       onGenerateRoute: (settings) {
+
         if (settings.name == '/prediction') {
           final waterData =
               settings.arguments as Map<String, double>;
 
           return MaterialPageRoute(
-            builder: (context) =>
+            builder: (_) =>
                 AiPredictionScreen(waterData: waterData),
           );
         }
+
+        if (settings.name == '/report') {
+          final waterData =
+              settings.arguments as Map<String, double>;
+
+          return MaterialPageRoute(
+            builder: (_) =>
+                FinalReportScreen(waterData: waterData),
+          );
+        }
+
         return null;
       },
     );

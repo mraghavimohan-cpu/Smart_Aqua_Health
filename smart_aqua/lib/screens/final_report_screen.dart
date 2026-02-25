@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
 class FinalReportScreen extends StatelessWidget {
-  const FinalReportScreen({Key? key}) : super(key: key);
+  final Map<String, double> waterData;
+
+  const FinalReportScreen({
+    Key? key,
+    required this.waterData,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final double turbidity = waterData["Turbidity"] ?? 0;
+    final double ph = waterData["pH Level"] ?? 7;
+
+    bool highRisk = turbidity > 5 || ph < 6.5 || ph > 8.5;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
 
@@ -38,38 +48,51 @@ class FinalReportScreen extends StatelessWidget {
                 ],
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
 
-                  const Text(
+                  /// Title Row
+                  Row(
+                    children: const [
+                      Icon(Icons.description,
+                          color: Colors.teal),
+                      SizedBox(width: 8),
+                      Text(
+                        "Final Comprehensive Report",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  buildMetricRow(
                     "AI Confidence Level",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    "92.4%",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const Divider(height: 25),
-
-                  buildMetricRow(
-                    title: "Avg pH Level",
-                    value: "8.4 (Alkaline)",
+                    highRisk ? "92.4%" : "98.7%",
                   ),
 
                   buildMetricRow(
-                    title: "Bacterial Colony Count",
-                    value: "High (1.2k/ml)",
-                    valueColor: Colors.red,
+                    "Avg pH Level",
+                    "$ph (${ph > 7.5 ? "Alkaline" : "Normal"})",
                   ),
 
                   buildMetricRow(
-                    title: "System Uptime",
-                    value: "99.9%",
+                    "Bacterial Colony Count",
+                    highRisk
+                        ? "High (1.2k/ml)"
+                        : "Normal",
+                    valueColor:
+                        highRisk ? Colors.red : Colors.green,
+                  ),
+
+                  buildMetricRow(
+                    "System Uptime",
+                    "99.9%",
                   ),
 
                   const SizedBox(height: 20),
@@ -82,14 +105,20 @@ class FinalReportScreen extends StatelessWidget {
                       borderRadius:
                           BorderRadius.circular(15),
                       border: Border.all(
-                          color: Colors.yellow.shade200),
+                        color: Colors.yellow.shade300,
+                      ),
                     ),
-                    child: const Text(
-                      "Summary: The model identified spectral anomalies "
-                      "consistent with V. cholerae. Immediate purification "
-                      "intervention is required. Automated safeguards have "
-                      "isolated the main reservoir.",
-                      style: TextStyle(fontSize: 14),
+                    child: Text(
+                      highRisk
+                          ? "Summary: The model identified spectral anomalies "
+                            "consistent with bacterial contamination. "
+                            "Immediate purification intervention is required."
+                          : "Summary: All monitored water parameters fall "
+                            "within safe regulatory standards. No immediate "
+                            "intervention required.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                      ),
                     ),
                   ),
 
@@ -123,11 +152,12 @@ class FinalReportScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        ScaffoldMessenger.of(context)
+                        ScaffoldMessenger.of(
+                                context)
                             .showSnackBar(
                           const SnackBar(
                             content: Text(
-                                "Downloading Report..."),
+                                "Generating PDF Report..."),
                           ),
                         );
                       },
@@ -143,8 +173,8 @@ class FinalReportScreen extends StatelessWidget {
             const Text(
               "RISK DISTRIBUTION MAP",
               style: TextStyle(
-                color: Colors.grey,
                 fontWeight: FontWeight.bold,
+                color: Colors.grey,
               ),
             ),
 
@@ -155,33 +185,58 @@ class FinalReportScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius:
                     BorderRadius.circular(20),
-                image: const DecorationImage(
-                  image: AssetImage(
-                      "assets/logo.png"), // replace with real map image
-                  fit: BoxFit.cover,
-                ),
+                color: Colors.grey.shade300,
               ),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Container(
-                  margin: const EdgeInsets.all(10),
-                  padding:
-                      const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(
-                            15),
+              child: Stack(
+                children: [
+
+                  /// Map Placeholder
+                  const Center(
+                    child: Text(
+                      "Heatmap Visualization",
+                      style: TextStyle(
+                          color: Colors.black54),
+                    ),
                   ),
-                  child: const Text(
-                    "Sector A-12",
-                    style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold),
+
+                  /// Red Risk Zone Indicator
+                  if (highRisk)
+                    Center(
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color:
+                              Colors.red.withOpacity(0.3),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(
+                                15),
+                      ),
+                      child: const Text(
+                        "Sector A-12",
+                        style: TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -190,14 +245,14 @@ class FinalReportScreen extends StatelessWidget {
     );
   }
 
-  Widget buildMetricRow({
-    required String title,
-    required String value,
+  Widget buildMetricRow(
+    String title,
+    String value, {
     Color valueColor = Colors.black,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          vertical: 6),
+      padding:
+          const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment:
             MainAxisAlignment.spaceBetween,
@@ -208,7 +263,8 @@ class FinalReportScreen extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight:
+                  FontWeight.bold,
               color: valueColor,
             ),
           ),
