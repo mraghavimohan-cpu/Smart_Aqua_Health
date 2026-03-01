@@ -5,10 +5,10 @@ class WaterQualityScreen extends StatelessWidget {
   WaterQualityScreen({Key? key}) : super(key: key);
 
   final Map<String, double> waterData = {
-    "pH Level": 7.2,
-    "Turbidity": 4.5,
-    "Temperature": 24.1,
-    "Dissolved Oxygen": 8.2,
+    "pH Level": 10.2,
+    "Turbidity": 9.5,
+    "Temperature": 98.1,
+    "Dissolved Oxygen": 1.2,
   };
 
   @override

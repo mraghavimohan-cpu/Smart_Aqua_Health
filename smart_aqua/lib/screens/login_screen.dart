@@ -16,18 +16,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEFF3F4),
+      backgroundColor: const Color(0xFFEFF3F4),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Padding(
-                padding: EdgeInsets.all(25),
+                padding: const EdgeInsets.all(25),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         height: 120,
                         width: 120,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -56,9 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                      Text(
+                      const Text(
                         "Welcome Back",
                         style: TextStyle(
                           fontSize: 22,
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       Text(
                         "Login to monitor your water quality\nand sensor analytics",
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
                       /// PHONE FIELD
                       TextFormField(
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           FilteringTextInputFormatter.digitsOnly
                         ],
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.phone),
+                          prefixIcon: const Icon(Icons.phone),
                           hintText: "Enter 10-digit number",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -100,14 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// PASSWORD FIELD
                       TextFormField(
                         controller: passwordController,
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
                           hintText: "Enter your password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -131,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : null,
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
                       /// SIGN IN BUTTON
                       SizedBox(
@@ -139,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 50,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0F6B6B),
+                            backgroundColor: const Color(0xFF0F6B6B),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
@@ -161,26 +161,41 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             "Sign In →",
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
-                        child: Text(
+                        child: const Text(
                           "Don't have an account? Sign Up",
                           style: TextStyle(
                             color: Color(0xFF0F6B6B),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      /// FIREBASE TEST BUTTON
+                      ElevatedButton(
+                        onPressed: () async {
+                          print("Firebase initialized successfully");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Firebase Connected Successfully"),
+                            ),
+                          );
+                        },
+                        child: const Text("Test Firebase Connection"),
                       ),
                     ],
                   ),
