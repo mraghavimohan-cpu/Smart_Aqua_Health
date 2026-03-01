@@ -185,18 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 15),
 
-                      /// FIREBASE TEST BUTTON
-                      ElevatedButton(
-                        onPressed: () async {
-                          print("Firebase initialized successfully");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Firebase Connected Successfully"),
-                            ),
-                          );
-                        },
-                        child: const Text("Test Firebase Connection"),
-                      ),
+                      
+                      
                     ],
                   ),
                 ),
