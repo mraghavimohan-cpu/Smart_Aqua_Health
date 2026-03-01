@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/water_quality_screen.dart';
-import 'patient_details_screen.dart';
 import '../widgets/ui_components.dart';
 
-
 class FinalReportScreen extends StatelessWidget {
+  const FinalReportScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +12,7 @@ class FinalReportScreen extends StatelessWidget {
           title: "Final Water Health Report",
           child: Column(
             children: [
-              Text(
+              const Text(
                 "Water Status: Unsafe",
                 style: TextStyle(
                   fontSize: 18,
@@ -21,25 +20,19 @@ class FinalReportScreen extends StatelessWidget {
                   color: Colors.red,
                 ),
               ),
-
-              SizedBox(height: 10),
-
-              Text("Recommended Action: Avoid Consumption"),
-
-              SizedBox(height: 20),
-
+              const SizedBox(height: 10),
+              const Text("Recommended Action: Avoid Consumption"),
+              const SizedBox(height: 20),
               buildButton("Send SMS Alert", () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("SMS Alert Sent")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("SMS Alert Sent")),
+                );
               }),
-
-              SizedBox(height: 10),
-
+              const SizedBox(height: 10),
               buildButton("Send Voice Alert", () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Voice Call Triggered")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Voice Call Triggered")),
+                );
               }),
             ],
           ),

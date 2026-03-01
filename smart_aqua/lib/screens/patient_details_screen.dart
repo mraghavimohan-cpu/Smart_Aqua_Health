@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../services/auth_service.dart';
 import 'water_quality_screen.dart';
 
 class PatientDetailsScreen extends StatefulWidget {
+  const PatientDetailsScreen({super.key});
+
   @override
-  _PatientDetailsScreenState createState() =>
-      _PatientDetailsScreenState();
+  State<PatientDetailsScreen> createState() => _PatientDetailsScreenState();
 }
 
 class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -20,7 +21,6 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
   String waterUse = "Drinking";
 
   final List<String> symptomsList = [
-
     // General symptoms
     "Fever",
     "Nausea",
@@ -43,21 +43,50 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
   List<String> selectedSymptoms = [];
 
   @override
+  void dispose() {
+    nameController.dispose();
+    ageController.dispose();
+    phoneController.dispose();
+    locationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Icon(Icons.arrow_back, color: Colors.black),
-        title: Text("Health Assessment",
-            style: TextStyle(color: Colors.black)),
+        // FIX: was Icon(...), now correctly an IconButton with an onPressed
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "Health Assessment",
+          style: TextStyle(color: Colors.black),
+        ),
         actions: [
+          // Logout button
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.teal),
+            tooltip: "Logout",
+            onPressed: () async {
+              await AuthService.signOut();
+              if (!context.mounted) return;
+              // Clear entire stack and go back to login
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false,
+              );
+            },
+          ),
           Padding(
-            padding: EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: Text(
+              child: const Text(
                 "STEP 1/2",
                 style: TextStyle(
                   color: Colors.teal,
@@ -68,33 +97,27 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
           )
         ],
       ),
-
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               LinearProgressIndicator(
                 value: 0.5,
                 backgroundColor: Colors.grey[300],
                 color: Colors.teal,
               ),
-
-              SizedBox(height: 25),
-
-              Text(
+              const SizedBox(height: 25),
+              const Text(
                 "1. Patient Details",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              SizedBox(height: 20),
-
+              const SizedBox(height: 20),
               buildField(
                 controller: nameController,
                 hint: "Full Name",
@@ -105,9 +128,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                   return null;
                 },
               ),
-
-              SizedBox(height: 15),
-
+              const SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
@@ -123,10 +144,10 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                       },
                     ),
                   ),
-                  SizedBox(width: 15),
+                  const SizedBox(width: 15),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: waterUse,
+                      initialValue: waterUse,
                       decoration: roundedDecoration("Water Use"),
                       items: ["Drinking", "Cooking", "Bathing"]
                           .map((e) => DropdownMenuItem(
@@ -143,9 +164,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                   ),
                 ],
               ),
-
-              SizedBox(height: 15),
-
+              const SizedBox(height: 15),
               buildField(
                 controller: phoneController,
                 hint: "Phone Number",
@@ -161,9 +180,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                   return null;
                 },
               ),
-
-              SizedBox(height: 15),
-
+              const SizedBox(height: 15),
               buildField(
                 controller: locationController,
                 hint: "Location",
@@ -174,59 +191,47 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                   return null;
                 },
               ),
-
-              SizedBox(height: 25),
-
-              Text(
+              const SizedBox(height: 25),
+              const Text(
                 "Symptoms (Multi-select)",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-
-              SizedBox(height: 15),
-
+              const SizedBox(height: 15),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children: symptomsList.map((symptom) {
-                  final isSelected =
-                      selectedSymptoms.contains(symptom);
+                  final isSelected = selectedSymptoms.contains(symptom);
 
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        if (isSelected)
+                        if (isSelected) {
                           selectedSymptoms.remove(symptom);
-                        else
+                        } else {
                           selectedSymptoms.add(symptom);
+                        }
                       });
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 18, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.teal
-                            : Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(25),
-                        border: Border.all(
-                            color: Colors.teal),
+                        color: isSelected ? Colors.teal : Colors.white,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: Colors.teal),
                       ),
                       child: Text(
                         symptom,
                         style: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : Colors.black,
+                          color: isSelected ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
                   );
                 }).toList(),
               ),
-
-              SizedBox(height: 40),
-
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -234,8 +239,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                   ),
                   onPressed: () {
@@ -243,13 +247,12 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              WaterQualityScreen(),
+                          builder: (_) => const WaterQualityScreen(),
                         ),
                       );
                     }
                   },
-                  child: Text(
+                  child: const Text(
                     "Next",
                     style: TextStyle(
                       fontSize: 16,
@@ -274,8 +277,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
   }) {
     return TextFormField(
       controller: controller,
-      keyboardType:
-          isNumber ? TextInputType.number : TextInputType.text,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       maxLength: maxLength,
       inputFormatters: isNumber
           ? [
@@ -296,8 +298,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
       hintText: hint,
       filled: true,
       fillColor: Colors.white,
-      contentPadding:
-          EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(30),
         borderSide: BorderSide.none,

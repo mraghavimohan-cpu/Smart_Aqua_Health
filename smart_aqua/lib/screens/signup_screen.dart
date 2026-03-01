@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
@@ -10,8 +12,9 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
@@ -37,7 +40,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       /// HEADER
                       Row(
                         children: [
@@ -89,45 +91,72 @@ class _SignupScreenState extends State<SignupScreen> {
 
                       SizedBox(height: 25),
 
-                      /// FULL NAME
-                      Text("Full Name"),
-                      SizedBox(height: 5),
-                      TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person),
-                          hintText: "John Doe",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("First Name"),
+                                SizedBox(height: 5),
+                                TextFormField(
+                                  controller: firstNameController,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.person),
+                                    hintText: "First",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  validator: (value) =>
+                                      value!.isEmpty ? "Required" : null,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        validator: (value) =>
-                            value!.isEmpty ? "Name required" : null,
+                          SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Last Name"),
+                                SizedBox(height: 5),
+                                TextFormField(
+                                  controller: lastNameController,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.person_outline),
+                                    hintText: "Last",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  validator: (value) =>
+                                      value!.isEmpty ? "Required" : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
 
                       SizedBox(height: 15),
 
-                      /// PHONE
-                      Text("Phone Number"),
+                      /// EMAIL
+                      Text("Email Address"),
                       SizedBox(height: 5),
                       TextFormField(
-                        controller: phoneController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.phone),
-                          hintText: "10-digit number",
+                          prefixIcon: Icon(Icons.email),
+                          hintText: "Enter your email",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          counterText: "",
                         ),
                         validator: (value) {
-                          if (value == null || value.length != 10) {
-                            return "Enter 10 digit phone number";
+                          if (value == null || !value.contains('@')) {
+                            return "Enter a valid email";
                           }
                           return null;
                         },
@@ -242,26 +271,38 @@ class _SignupScreenState extends State<SignupScreen> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-
-                              bool success = AuthService.register(
-                                nameController.text.trim(),
-                                phoneController.text.trim(),
-                                passwordController.text.trim(),
+                              bool success = await AuthService.register(
+                                firstName: firstNameController.text.trim(),
+                                lastName: lastNameController.text.trim(),
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
                               );
 
+                              if (!context.mounted) return;
+
                               if (success) {
-                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Account created successfully. Please login."),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                Navigator.pop(context); // back to login
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text("User already exists")),
+                                    content: Text(
+                                        "Registration failed. Please check details or try logging in."),
+                                    backgroundColor: Colors.redAccent,
+                                  ),
                                 );
                               }
                             }
                           },
-                          child: Text("Create Account →"),
+                          child: const Text("Create Account →"),
                         ),
                       ),
 

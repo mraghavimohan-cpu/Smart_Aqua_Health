@@ -3,44 +3,53 @@ import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool isPasswordVisible = false;
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEFF3F4),
+      backgroundColor: const Color(0xFFEFF3F4),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Padding(
-                padding: EdgeInsets.all(25),
+                padding: const EdgeInsets.all(25),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-
                       /// CIRCULAR LOGO
                       Container(
                         height: 120,
                         width: 120,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black12,
                               blurRadius: 10,
@@ -56,9 +65,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                      Text(
+                      const Text(
                         "Welcome Back",
                         style: TextStyle(
                           fontSize: 22,
@@ -66,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       Text(
                         "Login to monitor your water quality\nand sensor analytics",
@@ -74,40 +83,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
-                      /// PHONE FIELD
+                      /// EMAIL FIELD
                       TextFormField(
-                        controller: phoneController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 10,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.phone),
-                          hintText: "Enter 10-digit number",
+                          prefixIcon: const Icon(Icons.email),
+                          hintText: "Enter your email",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          counterText: "",
                         ),
                         validator: (value) {
-                          if (value == null || value.length != 10) {
-                            return "Enter 10 digit phone number";
+                          if (value == null || !value.contains('@')) {
+                            return "Enter a valid email";
                           }
                           return null;
                         },
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// PASSWORD FIELD
                       TextFormField(
                         controller: passwordController,
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
                           hintText: "Enter your password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -125,13 +129,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                         ),
-                        validator: (value) =>
-                            value == null || value.isEmpty
-                                ? "Password required"
-                                : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Password required"
+                            : null,
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
                       /// SIGN IN BUTTON
                       SizedBox(
@@ -139,42 +142,65 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 50,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0F6B6B),
+                            backgroundColor: const Color(0xFF0F6B6B),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() => isLoading = true);
 
-                              String result = AuthService.login(
-                                phoneController.text.trim(),
-                                passwordController.text.trim(),
-                              );
+                                    bool success = await AuthService.login(
+                                      email: emailController.text.trim(),
+                                      password: passwordController.text.trim(),
+                                    );
 
-                              if (result == "success") {
-                                Navigator.pushNamed(context, '/patient');
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(result)),
-                                );
-                              }
-                            }
-                          },
-                          child: Text(
-                            "Sign In →",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                                    if (!context.mounted) return;
+                                    setState(() => isLoading = false);
+
+                                    if (success) {
+                                      // Use pushNamedAndRemoveUntil so back button
+                                      // won't return to login after sign-in
+                                      Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        '/patient',
+                                        (route) => false,
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text("Invalid email or password"),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  "Sign In →",
+                                  style: TextStyle(fontSize: 16),
+                                ),
                         ),
                       ),
 
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
-                        child: Text(
+                        child: const Text(
                           "Don't have an account? Sign Up",
                           style: TextStyle(
                             color: Color(0xFF0F6B6B),

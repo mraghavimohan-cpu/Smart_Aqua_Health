@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-import '../screens/final_report_screen.dart';
 import '../widgets/ui_components.dart';
 
-
-
 class AIPredictionScreen extends StatefulWidget {
+  const AIPredictionScreen({super.key});
+
   @override
-  _AIPredictionScreenState createState() => _AIPredictionScreenState();
+  State<AIPredictionScreen> createState() => _AIPredictionScreenState();
 }
 
 class _AIPredictionScreenState extends State<AIPredictionScreen> {
   String predictionResult = "Analyzing...";
+  bool isAnalyzing = true;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        predictionResult = "Possible Waterborne Disease Detected";
-      });
+    _runPrediction();
+  }
+
+  Future<void> _runPrediction() async {
+    // Simulate AI prediction delay
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() {
+      predictionResult = "Possible Waterborne Disease Detected";
+      isAnalyzing = false;
     });
   }
 
@@ -30,17 +36,18 @@ class _AIPredictionScreenState extends State<AIPredictionScreen> {
           title: "AI Prediction",
           child: Column(
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
+              // Show spinner only while analyzing
+              if (isAnalyzing) const CircularProgressIndicator(),
+              const SizedBox(height: 20),
               Text(
                 predictionResult,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-
-              SizedBox(height: 20),
-
+              const SizedBox(height: 20),
+              // FIX: was '../screens/final_report_screen.dart' (file path, not a route)
               buildButton("Generate Report", () {
-                Navigator.pushNamed(context, '../screens/final_report_screen.dart');
+                Navigator.pushNamed(context, '/report');
               }),
             ],
           ),

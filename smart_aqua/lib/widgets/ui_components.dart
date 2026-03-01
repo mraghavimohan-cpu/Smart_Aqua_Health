@@ -1,103 +1,84 @@
 import 'package:flutter/material.dart';
 
+/// Wraps a screen body in a full-screen teal gradient background
 Widget gradientWrapper({required Widget child}) {
   return Container(
-    decoration: BoxDecoration(
+    width: double.infinity,
+    height: double.infinity,
+    decoration: const BoxDecoration(
       gradient: LinearGradient(
-        colors: [Color(0xFF4FC3F7), Color(0xFF0D47A1)],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+        colors: [Color(0xFF0F6B6B), Color(0xFF1CA7A6)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ),
     ),
-    child: Center(child: SingleChildScrollView(child: child)),
+    child: SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: child,
+        ),
+      ),
+    ),
   );
 }
 
+/// A white rounded card with a title and a content child
 class CardWrapper extends StatelessWidget {
   final String title;
   final Widget child;
 
   const CardWrapper({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 10,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0D47A1),
-                ),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 8,
+      child: Padding(
+        padding: const EdgeInsets.all(25),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 20),
-              child,
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            child,
+          ],
         ),
       ),
     );
   }
 }
 
-Widget buildTextField(
-  TextEditingController controller,
-  String label, {
-  bool isNumber = false,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 15),
-    child: TextField(
-      controller: controller,
-      keyboardType:
-          isNumber ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
+/// A full-width teal elevated button
+Widget buildButton(String label, VoidCallback onPressed) {
+  return SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF0F6B6B),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
       ),
-    ),
-  );
-}
-
-Widget buildButton(String text, VoidCallback onPressed) {
-  return Container(
-    width: double.infinity,
-    height: 50,
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF4FC3F7), Color(0xFF0D47A1)],
-      ),
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-      ),
       onPressed: onPressed,
       child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        label,
+        style: const TextStyle(fontSize: 16, color: Colors.white),
       ),
     ),
   );

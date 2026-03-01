@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "538025531981",
+    "project_id": "smart-aqua-abc9d",
+    "storage_bucket": "smart-aqua-abc9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538025531981:android:42958fa644cd4ff4205a04",
+        "android_client_info": {
+          "package_name": "com.example.Smart_Aqua"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7WBlTJS_xUraNYCNqucOJ60l2idnRZmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
