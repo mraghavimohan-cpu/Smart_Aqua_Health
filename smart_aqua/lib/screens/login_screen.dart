@@ -162,11 +162,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     setState(() => isLoading = false);
 
                                     if (success) {
-                                      // Use pushNamedAndRemoveUntil so back button
-                                      // won't return to login after sign-in
+                                      
                                       Navigator.pushNamedAndRemoveUntil(
                                         context,
-                                        '/patient',
+                                        '/dashboard',
                                         (route) => false,
                                       );
                                     } else {
@@ -189,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )
                               : const Text(
                                   "Sign In →",
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(fontSize: 16,color: Colors.white),
                                 ),
                         ),
                       ),

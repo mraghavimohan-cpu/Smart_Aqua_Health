@@ -13,12 +13,21 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
   bool isPasswordVisible = false;
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,52 +100,19 @@ class _SignupScreenState extends State<SignupScreen> {
 
                       SizedBox(height: 25),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("First Name"),
-                                SizedBox(height: 5),
-                                TextFormField(
-                                  controller: firstNameController,
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.person),
-                                    hintText: "First",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                  ),
-                                  validator: (value) =>
-                                      value!.isEmpty ? "Required" : null,
-                                ),
-                              ],
-                            ),
+                      Text("First Name"),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: firstNameController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.person),
+                          hintText: " name",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          SizedBox(width: 15),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Last Name"),
-                                SizedBox(height: 5),
-                                TextFormField(
-                                  controller: lastNameController,
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.person_outline),
-                                    hintText: "Last",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                  ),
-                                  validator: (value) =>
-                                      value!.isEmpty ? "Required" : null,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Required" : null,
                       ),
 
                       SizedBox(height: 15),
@@ -149,7 +125,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.email),
-                          hintText: "Enter your email",
+                          hintText: "Email",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -172,7 +148,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.lock),
-                          hintText: "Create a password",
+                          hintText: "Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -245,7 +221,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.lock_reset),
-                          hintText: "Repeat your password",
+                          hintText: "Confirm Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -271,38 +247,62 @@ class _SignupScreenState extends State<SignupScreen> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              bool success = await AuthService.register(
-                                firstName: firstNameController.text.trim(),
-                                lastName: lastNameController.text.trim(),
-                                email: emailController.text.trim(),
-                                password: passwordController.text.trim(),
-                              );
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() => isLoading = true);
 
-                              if (!context.mounted) return;
+                                    final result = await AuthService.register(
+                                      firstName:
+                                          firstNameController.text.trim(),
+                                      email: emailController.text.trim(),
+                                      password: passwordController.text.trim(),
+                                    );
 
-                              if (success) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        "Account created successfully. Please login."),
-                                    backgroundColor: Colors.green,
+                                    if (!context.mounted) return;
+                                    setState(() => isLoading = false);
+
+                                    if (result['success'] == true) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Account created successfully. Please login."),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                      // Navigate to login and clear stack
+                                      Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        '/login',
+                                        (route) => false,
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(result['error'] ??
+                                              "Registration failed. Please check details or try logging in."),
+                                          backgroundColor: Colors.redAccent,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
                                   ),
-                                );
-                                Navigator.pop(context); // back to login
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        "Registration failed. Please check details or try logging in."),
-                                    backgroundColor: Colors.redAccent,
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                          child: const Text("Create Account →"),
+                                )
+                              : const Text(
+                                  "Create Account →",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                         ),
                       ),
 

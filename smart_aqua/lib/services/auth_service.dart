@@ -6,42 +6,61 @@ class AuthService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // ✅ Static register — matches: bool success = await AuthService.register(...)
-  static Future<bool> register({
+  static Future<Map<String, dynamic>> register({
     required String firstName,
-    required String lastName,
     required String email,
     required String password,
   }) async {
     try {
+      print('DEBUG: Starting registration for $email');
+
       // 1. Create user in Firebase Auth
-      final credential = await _auth.createUserWithEmailAndPassword(
+      final credential = await _auth
+          .createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      );
-
-      final user = credential.user!;
-
-      // 2. Update display name
-      await user.updateDisplayName('$firstName $lastName');
-
-      // 3. Save details to Firestore /users/{uid}
-      await _db.collection('users').doc(user.uid).set({
-        'uid':         user.uid,
-        'firstName':   firstName.trim(),
-        'lastName':    lastName.trim(),
-        'email':       email.trim(),
-        'displayName': '$firstName $lastName',
-        'createdAt':   FieldValue.serverTimestamp(),
+      )
+          .timeout(const Duration(seconds: 15), onTimeout: () {
+        throw FirebaseAuthException(
+            code: 'network-request-failed', message: 'Auth timeout');
       });
 
-      return true; // ✅ success
+      final user = credential.user!;
+      print('DEBUG: Auth user created: ${user.uid}');
 
+      // 2. Update display name
+      await user.updateDisplayName(firstName);
+      print('DEBUG: Display name updated');
+
+      // 3. Save details to Firestore /users/{uid}
+      // Added timeout to prevent infinite hang if Firestore is unreachable
+      await _db.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'firstName': firstName.trim(),
+        'email': email.trim(),
+        'displayName': firstName.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        print('DEBUG: Firestore write timed out');
+        // We don't necessarily want to fail registration if only Firestore fails,
+        // but for now let's track it.
+        throw FirebaseException(
+            plugin: 'cloud_firestore',
+            code: 'timeout',
+            message: 'Firestore write timed out');
+      });
+
+      print('DEBUG: Firestore write success');
+      return {'success': true};
     } on FirebaseAuthException catch (e) {
-      print('Registration failed [${e.code}]: ${e.message}');
-      return false;
+      print('DEBUG: Registration failed [${e.code}]: ${e.message}');
+      return {'success': false, 'error': getErrorMessage(e.code)};
+    } on FirebaseException catch (e) {
+      print('DEBUG: Firestore error [${e.code}]: ${e.message}');
+      return {'success': false, 'error': 'Database error: ${e.message}'};
     } catch (e) {
-      print('Registration error: $e');
-      return false;
+      print('DEBUG: Registration error: $e');
+      return {'success': false, 'error': 'An unexpected error occurred: $e'};
     }
   }
 
