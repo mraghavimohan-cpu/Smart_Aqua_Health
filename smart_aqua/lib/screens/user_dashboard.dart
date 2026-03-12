@@ -157,7 +157,7 @@ class _HomeTabState extends State<_HomeTab> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          const Text('Stay healthy, drink clean water 💧',
+                          const Text('Stay healthy, drink clean water ',
                               style: TextStyle(color: Colors.white60, fontSize: 11)),
                         ],
                       ),

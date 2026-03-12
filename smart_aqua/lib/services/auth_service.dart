@@ -5,91 +5,118 @@ class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // ✅ Static register — matches: bool success = await AuthService.register(...)
   static Future<Map<String, dynamic>> register({
     required String firstName,
     required String email,
     required String password,
   }) async {
     try {
-      print('DEBUG: Starting registration for $email');
-
-      // 1. Create user in Firebase Auth
-      final credential = await _auth
-          .createUserWithEmailAndPassword(
+      final credential = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      )
-          .timeout(const Duration(seconds: 15), onTimeout: () {
-        throw FirebaseAuthException(
-            code: 'network-request-failed', message: 'Auth timeout');
-      });
+      );
 
       final user = credential.user!;
-      print('DEBUG: Auth user created: ${user.uid}');
+      print('DEBUG: User created: ${user.uid}');
 
-      // 2. Update display name
-      await user.updateDisplayName(firstName);
-      print('DEBUG: Display name updated');
+      await user.updateDisplayName(firstName.trim());
 
-      // 3. Save details to Firestore /users/{uid}
-      // Added timeout to prevent infinite hang if Firestore is unreachable
+      await user.sendEmailVerification();
+      print('DEBUG: Verification email sent to ${user.email}');
+
       await _db.collection('users').doc(user.uid).set({
         'uid': user.uid,
         'firstName': firstName.trim(),
         'email': email.trim(),
         'displayName': firstName.trim(),
+        'emailVerified': false,
         'createdAt': FieldValue.serverTimestamp(),
-      }).timeout(const Duration(seconds: 10), onTimeout: () {
-        print('DEBUG: Firestore write timed out');
-        // We don't necessarily want to fail registration if only Firestore fails,
-        // but for now let's track it.
-        throw FirebaseException(
-            plugin: 'cloud_firestore',
-            code: 'timeout',
-            message: 'Firestore write timed out');
       });
-
       print('DEBUG: Firestore write success');
+
+      await _auth.signOut();
+
       return {'success': true};
     } on FirebaseAuthException catch (e) {
-      print('DEBUG: Registration failed [${e.code}]: ${e.message}');
+      print('DEBUG: Register error [${e.code}]: ${e.message}');
       return {'success': false, 'error': getErrorMessage(e.code)};
-    } on FirebaseException catch (e) {
-      print('DEBUG: Firestore error [${e.code}]: ${e.message}');
-      return {'success': false, 'error': 'Database error: ${e.message}'};
     } catch (e) {
-      print('DEBUG: Registration error: $e');
-      return {'success': false, 'error': 'An unexpected error occurred: $e'};
+      print('DEBUG: Unexpected error: $e');
+      return {'success': false, 'error': 'An unexpected error occurred.'};
     }
   }
 
-  // ✅ Static login
-  static Future<bool> login({
+  // ✅ PASTE REPLACES FROM HERE
+  static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      );
-      return true;
+      ).timeout(const Duration(seconds: 30), onTimeout: () {
+        throw FirebaseAuthException(
+          code: 'network-request-failed',
+          message: 'Login timed out',
+        );
+      });
+
+      final user = credential.user!;
+
+      // Reload to get latest emailVerified status
+      await user.reload().timeout(const Duration(seconds: 10), onTimeout: () {
+        print('DEBUG: user.reload() timed out');
+      });
+
+      final refreshedUser = _auth.currentUser!;
+      print('DEBUG: emailVerified = ${refreshedUser.emailVerified}');
+
+      if (!refreshedUser.emailVerified) {
+        try {
+          await refreshedUser.sendEmailVerification();
+          print('DEBUG: Resent verification email');
+        } catch (e) {
+          print('DEBUG: Could not resend verification: $e');
+        }
+        await _auth.signOut();
+        return {
+          'success': false,
+          'error':
+              'Email not verified. A new link has been sent to $email. Check inbox/spam.',
+        };
+      }
+
+      // Firestore update with timeout so it never hangs
+      try {
+        await _db
+            .collection('users')
+            .doc(refreshedUser.uid)
+            .update({'emailVerified': true})
+            .timeout(const Duration(seconds: 8));
+        print('DEBUG: Firestore emailVerified updated');
+      } catch (e) {
+        // Don't block login if Firestore update fails
+        print('DEBUG: Firestore update skipped: $e');
+      }
+
+      return {'success': true};
     } on FirebaseAuthException catch (e) {
-      print('Login failed [${e.code}]: ${e.message}');
-      return false;
+      print('DEBUG: Login error [${e.code}]: ${e.message}');
+      return {'success': false, 'error': getErrorMessage(e.code)};
+    } catch (e) {
+      print('DEBUG: Unexpected login error: $e');
+      return {'success': false, 'error': 'An unexpected error occurred.'};
     }
   }
+  // ✅ TO HERE
 
-  // ✅ Static sign out
   static Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  // ✅ Current user
   static User? get currentUser => _auth.currentUser;
 
-  // ✅ Friendly error messages for UI display
   static String getErrorMessage(String code) {
     switch (code) {
       case 'email-already-in-use':
@@ -102,12 +129,12 @@ class AuthService {
         return 'No account found with this email.';
       case 'wrong-password':
         return 'Incorrect password. Please try again.';
-      case 'api-key-not-valid':
-        return 'Firebase not configured. Check your firebase_options.dart.';
+      case 'invalid-credential':
+        return 'Incorrect email or password. Please try again.';
       case 'network-request-failed':
         return 'Network error. Check your connection.';
       default:
-        return 'An error occurred. Please try again.';
+        return 'An error occurred [$code]. Please try again.';
     }
   }
 }

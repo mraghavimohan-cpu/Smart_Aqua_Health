@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -47,9 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         height: 120,
                         width: 120,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          boxShadow: const [
+                          boxShadow: [
                             BoxShadow(
                               color: Colors.black12,
                               blurRadius: 10,
@@ -153,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (_formKey.currentState!.validate()) {
                                     setState(() => isLoading = true);
 
-                                    bool success = await AuthService.login(
+                                    final result = await AuthService.login(
                                       email: emailController.text.trim(),
                                       password: passwordController.text.trim(),
                                     );
@@ -161,8 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     if (!context.mounted) return;
                                     setState(() => isLoading = false);
 
-                                    if (success) {
-                                      
+                                    if (result['success'] == true) {
                                       Navigator.pushNamedAndRemoveUntil(
                                         context,
                                         '/dashboard',
@@ -171,9 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text("Invalid email or password"),
+                                        SnackBar(
+                                          content: Text(result['error'] ??
+                                              "Invalid email or password"),
+                                          backgroundColor: Colors.redAccent,
                                         ),
                                       );
                                     }
@@ -188,7 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )
                               : const Text(
                                   "Sign In →",
-                                  style: TextStyle(fontSize: 16,color: Colors.white),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
                                 ),
                         ),
                       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -32,18 +31,18 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEFF3F4),
+      backgroundColor: const Color(0xFFEFF3F4),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Padding(
-                padding: EdgeInsets.all(25),
+                padding: const EdgeInsets.all(25),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -53,11 +52,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.arrow_back),
+                            icon: const Icon(Icons.arrow_back),
                             onPressed: () => Navigator.pop(context),
                           ),
-                          SizedBox(width: 5),
-                          Text(
+                          const SizedBox(width: 5),
+                          const Text(
                             "Create Your Account",
                             style: TextStyle(
                               fontSize: 18,
@@ -67,65 +66,63 @@ class _SignupScreenState extends State<SignupScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// GRADIENT HEADER BOX
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(25),
+                        padding: const EdgeInsets.all(25),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF0F6B6B),
-                              Color(0xFF1CA7A6),
-                            ],
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0F6B6B), Color(0xFF1CA7A6)],
                           ),
                         ),
-                        child: Column(
+                        child: const Column(
                           children: [
-                            Icon(Icons.water_drop,
-                                color: Colors.white, size: 40),
+                            Icon(Icons.water_drop, color: Colors.white, size: 40),
                             SizedBox(height: 8),
                             Text(
                               "AquaSense IoT",
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            )
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
-                      Text("First Name"),
-                      SizedBox(height: 5),
+                      /// FIRST NAME
+                      const Text("First Name"),
+                      const SizedBox(height: 5),
                       TextFormField(
                         controller: firstNameController,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person),
-                          hintText: " name",
+                          prefixIcon: const Icon(Icons.person),
+                          hintText: "Enter your name",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         validator: (value) =>
-                            value!.isEmpty ? "Required" : null,
+                            value == null || value.isEmpty ? "Required" : null,
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// EMAIL
-                      Text("Email Address"),
-                      SizedBox(height: 5),
+                      const Text("Email Address"),
+                      const SizedBox(height: 5),
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.email),
-                          hintText: "Email",
+                          prefixIcon: const Icon(Icons.email),
+                          hintText: "Enter your email",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -138,16 +135,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// PASSWORD
-                      Text("Password"),
-                      SizedBox(height: 5),
+                      const Text("Password"),
+                      const SizedBox(height: 5),
                       TextFormField(
                         controller: passwordController,
                         obscureText: !isPasswordVisible,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
                           hintText: "Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -183,24 +180,25 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
 
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
                       /// SECURITY BOX
                       Container(
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           color: Colors.blueGrey[50],
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               "SECURITY REQUIREMENTS",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: Colors.teal),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.teal,
+                              ),
                             ),
                             SizedBox(height: 8),
                             Text("• 8+ characters"),
@@ -211,16 +209,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       /// CONFIRM PASSWORD
-                      Text("Confirm Password"),
-                      SizedBox(height: 5),
+                      const Text("Confirm Password"),
+                      const SizedBox(height: 5),
                       TextFormField(
                         controller: confirmPasswordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.lock_reset),
+                          prefixIcon: const Icon(Icons.lock_reset),
                           hintText: "Confirm Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -234,15 +232,15 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
 
-                      SizedBox(height: 25),
+                      const SizedBox(height: 25),
 
-                      /// CREATE BUTTON
+                      /// CREATE ACCOUNT BUTTON
                       SizedBox(
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0F6B6B),
+                            backgroundColor: const Color(0xFF0F6B6B),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
@@ -254,8 +252,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     setState(() => isLoading = true);
 
                                     final result = await AuthService.register(
-                                      firstName:
-                                          firstNameController.text.trim(),
+                                      firstName: firstNameController.text.trim(),
                                       email: emailController.text.trim(),
                                       password: passwordController.text.trim(),
                                     );
@@ -264,26 +261,58 @@ class _SignupScreenState extends State<SignupScreen> {
                                     setState(() => isLoading = false);
 
                                     if (result['success'] == true) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
+                                      // Show verification email sent dialog
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) => AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          title: const Row(
+                                            children: [
+                                              Icon(Icons.mark_email_unread,
+                                                  color: Color(0xFF0F6B6B)),
+                                              SizedBox(width: 10),
+                                              Text("Check Your Email"),
+                                            ],
+                                          ),
                                           content: Text(
-                                              "Account created successfully. Please login."),
-                                          backgroundColor: Colors.green,
+                                            "A verification link has been sent to:\n\n${emailController.text.trim()}\n\nClick the link in the email to verify your account, then come back to log in.\n\nDon't forget to check your spam folder.",
+                                          ),
+                                          actions: [
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color(0xFF0F6B6B),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator
+                                                    .pushNamedAndRemoveUntil(
+                                                  context,
+                                                  '/login',
+                                                  (route) => false,
+                                                );
+                                              },
+                                              child: const Text(
+                                                "Go to Login",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                      // Navigate to login and clear stack
-                                      Navigator.pushNamedAndRemoveUntil(
-                                        context,
-                                        '/login',
-                                        (route) => false,
                                       );
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
                                           content: Text(result['error'] ??
-                                              "Registration failed. Please check details or try logging in."),
+                                              "Registration failed."),
                                           backgroundColor: Colors.redAccent,
                                         ),
                                       );
@@ -306,18 +335,17 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
 
                       Center(
                         child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
                             "Already have an account? Log in",
                             style: TextStyle(
-                                color: Color(0xFF0F6B6B),
-                                fontWeight: FontWeight.bold),
+                              color: Color(0xFF0F6B6B),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
